@@ -6,6 +6,7 @@ import Flashcards from './components/Flashcards';
 import ContentLibrary from './components/ContentLibrary';
 
 export default function App() {
+  console.log('[v0] App rendering, pathologyTopics:', pathologyTopics?.length);
   const [view, setView] = useState('home');
 
   const renderView = () => {
