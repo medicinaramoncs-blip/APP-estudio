@@ -1,0 +1,27 @@
+{
+  "topics": [
+    {
+      "id": "hemodinamicos",
+      "title": "Trastornos Hemodinámicos",
+      "essays": [
+        {
+          "question": "Explique los factores que condicionan la gravedad de la lesión producida por la oclusión vascular.",
+          "modelAnswer": "La gravedad depende de: 1. Naturaleza del vaso obstruido (arterial vs venoso, calibre). 2. Existencia de circulación colateral (suficiente vs insuficiente). 3. Velocidad de oclusión (gradual permite adaptación). 4. Vulnerabilidad del tejido a la hipoxia (ej. neuronas muy sensibles, fibroblastos resistentes)."
+        }
+      ],
+      "flashcards": [
+        { "term": "Edema", "definition": "Aumento del fluido plasmático intracelular o intersticial en tejidos y cavidades serosas." }
+      ]
+    },
+    {
+      "id": "neoplasias",
+      "title": "Neoplasias",
+      "essays": [
+        {
+          "question": "Diferencie las características de las neoplasias benignas y malignas.",
+          "modelAnswer": "Benignas: Crecimiento localizado, capsuladas, lento, sin metástasis. Malignas: Invasión local, falta de cápsula, crecimiento rápido, capacidad de metástasis."
+        }
+      ]
+    }
+  ]
+}
