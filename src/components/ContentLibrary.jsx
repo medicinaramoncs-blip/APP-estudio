@@ -1,26 +1,41 @@
 import React, { useState } from 'react';
 import { pathologyTopics } from '../data/content';
-import { ChevronDown, ChevronUp, ChevronRight, BookOpen, FileText, Layers } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronRight, BookOpen, FileText, Layers, Search, BarChart3 } from 'lucide-react';
 
 export default function ContentLibrary() {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [expandedSection, setExpandedSection] = useState('essays');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showAnswer, setShowAnswer] = useState({});
 
   const hasTopics = pathologyTopics.length > 0;
 
+  const topicColors = {
+    'generalidades': 'from-blue-500 to-cyan-500',
+    'adaptacion-celular': 'from-emerald-500 to-teal-500',
+    'neoplasia': 'from-purple-500 to-violet-500',
+    'trastornos-hemodinamicos': 'from-rose-500 to-red-500'
+  };
+
   const getTopicColor = (id) => topicColors[id] || 'from-gray-500 to-gray-600';
 
-  const topicColors = {
-    generalidades: 'from-blue-500 to-cyan-500',
-    'tecnicas-histologicas': 'from-cyan-500 to-sky-500',
-    'citologia': 'from-teal-500 to-emerald-500',
-    'adaptacion-celular': 'from-emerald-500 to-teal-500',
-    'lesion-muerte-celular': 'from-lime-500 to-green-500',
-    inflamacion: 'from-rose-500 to-red-500',
-    reparacion: 'from-orange-500 to-amber-500',
-    'hemodinamicos': 'from-amber-500 to-yellow-500',
-    neoplasias: 'from-purple-500 to-violet-500',
-    autopsia: 'from-slate-500 to-zinc-500'
+  // Estadísticas totales
+  const totalEssays = pathologyTopics.reduce((acc, t) => acc + (t.essays?.length || 0), 0);
+  const totalFlashcards = pathologyTopics.reduce((acc, t) => acc + (t.flashcards?.length || 0), 0);
+
+  // Filtrar contenido por búsqueda
+  const filteredEssays = selectedTopic?.essays?.filter(e => 
+    e.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    e.modelAnswer.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  const filteredFlashcards = selectedTopic?.flashcards?.filter(c => 
+    c.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.definition.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  const toggleAnswer = (id) => {
+    setShowAnswer(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
   return (
@@ -29,7 +44,31 @@ export default function ContentLibrary() {
         <BookOpen className="w-4 h-4" />
         <span>Biblioteca</span>
         <ChevronRight className="w-4 h-4" />
-        <span className="text-white">Contenido</span>
+        <span className="text-white">Contenido Completo</span>
+      </div>
+
+      {/* Estadísticas Generales */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+          <BarChart3 className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+          <p className="text-2xl font-bold text-white">{pathologyTopics.length}</p>
+          <p className="text-xs text-slate-400">Temas</p>
+        </div>
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+          <FileText className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+          <p className="text-2xl font-bold text-white">{totalEssays}</p>
+          <p className="text-xs text-slate-400">Ensayos</p>
+        </div>
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+          <Layers className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
+          <p className="text-2xl font-bold text-white">{totalFlashcards}</p>
+          <p className="text-xs text-slate-400">Flashcards</p>
+        </div>
+        <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+          <BookOpen className="w-6 h-6 text-rose-400 mx-auto mb-2" />
+          <p className="text-2xl font-bold text-white">{totalEssays + totalFlashcards}</p>
+          <p className="text-xs text-slate-400">Total Items</p>
+        </div>
       </div>
 
       {!hasTopics ? (
@@ -40,20 +79,29 @@ export default function ContentLibrary() {
         </div>
       ) : (
         <>
+          {/* Selector de Temas con tarjetas */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-            <h2 className="text-sm font-medium text-slate-400 mb-3">Seleccionar Tema</h2>
-            <div className="flex flex-wrap gap-2">
+            <h2 className="text-sm font-medium text-slate-400 mb-4">Seleccionar Tema</h2>
+            <div className="grid md:grid-cols-2 gap-3">
               {pathologyTopics.map(topic => (
                 <button
                   key={topic.id}
-                  onClick={() => setSelectedTopic(topic)}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
+                  onClick={() => { setSelectedTopic(topic); setSearchTerm(''); setShowAnswer({}); }}
+                  className={`p-4 rounded-xl text-left transition-all duration-300 border ${
                     selectedTopic?.id === topic.id
-                      ? `bg-gradient-to-r ${getTopicColor(topic.id)} text-white shadow-lg`
-                      : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
+                      ? `bg-gradient-to-r ${getTopicColor(topic.id)} text-white shadow-lg border-transparent`
+                      : 'bg-white/5 text-slate-300 hover:bg-white/10 border-white/10'
                   }`}
                 >
-                  {topic.title}
+                  <p className="font-semibold">{topic.title}</p>
+                  <p className={`text-xs mt-1 ${selectedTopic?.id === topic.id ? 'text-white/80' : 'text-slate-500'}`}>
+                    {topic.essays?.length || 0} ensayos · {topic.flashcards?.length || 0} tarjetas
+                  </p>
+                  {topic.description && (
+                    <p className={`text-xs mt-2 line-clamp-2 ${selectedTopic?.id === topic.id ? 'text-white/70' : 'text-slate-500'}`}>
+                      {topic.description}
+                    </p>
+                  )}
                 </button>
               ))}
             </div>
@@ -61,6 +109,19 @@ export default function ContentLibrary() {
 
           {selectedTopic && (
             <>
+              {/* Buscador */}
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <input
+                  type="text"
+                  placeholder={`Buscar en ${selectedTopic.title}...`}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 outline-none transition-all"
+                />
+              </div>
+
+              {/* Sección de Ensayos */}
               <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
                 <button
                   onClick={() => setExpandedSection(expandedSection === 'essays' ? '' : 'essays')}
@@ -72,22 +133,49 @@ export default function ContentLibrary() {
                     </div>
                     <div className="text-left">
                       <span className="font-semibold text-white">Preguntas de Ensayo</span>
-                      <p className="text-xs text-slate-400">{selectedTopic.essays?.length || 0} preguntas disponibles</p>
+                      <p className="text-xs text-slate-400">
+                        {searchTerm ? `${filteredEssays.length} resultados` : `${selectedTopic.essays?.length || 0} preguntas disponibles`}
+                      </p>
                     </div>
                   </div>
                   {expandedSection === 'essays' ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
                 </button>
                 {expandedSection === 'essays' && (
-                  <div className="p-5 space-y-3 border-t border-white/10">
-                    {selectedTopic.essays?.length > 0 ? selectedTopic.essays.map((essay, idx) => (
-                      <div key={essay.id} className="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
-                        <p className="text-slate-300 text-sm"><span className="text-purple-400 font-semibold">{idx + 1}.</span> {essay.question}</p>
+                  <div className="p-5 space-y-4 border-t border-white/10">
+                    {filteredEssays.length > 0 ? filteredEssays.map((essay, idx) => (
+                      <div key={essay.id} className="bg-white/5 rounded-xl overflow-hidden">
+                        <div className="p-4">
+                          <p className="text-white font-medium">
+                            <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-r ${getTopicColor(selectedTopic.id)} text-xs font-bold mr-2`}>
+                              {idx + 1}
+                            </span>
+                            {essay.question}
+                          </p>
+                          <button
+                            onClick={() => toggleAnswer(essay.id)}
+                            className="mt-3 text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
+                          >
+                            {showAnswer[essay.id] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            {showAnswer[essay.id] ? 'Ocultar respuesta' : 'Ver respuesta modelo'}
+                          </button>
+                        </div>
+                        {showAnswer[essay.id] && (
+                          <div className="p-4 bg-emerald-500/10 border-t border-emerald-500/20">
+                            <p className="text-xs text-emerald-400 font-semibold mb-2">RESPUESTA MODELO:</p>
+                            <p className="text-slate-300 text-sm leading-relaxed">{essay.modelAnswer}</p>
+                          </div>
+                        )}
                       </div>
-                    )) : <p className="text-slate-500 text-center py-4">No hay essays en este tema</p>}
+                    )) : (
+                      <p className="text-slate-500 text-center py-4">
+                        {searchTerm ? 'No se encontraron ensayos con ese término' : 'No hay ensayos en este tema'}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
 
+              {/* Sección de Flashcards */}
               <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
                 <button
                   onClick={() => setExpandedSection(expandedSection === 'flashcards' ? '' : 'flashcards')}
@@ -98,20 +186,28 @@ export default function ContentLibrary() {
                       <Layers className="w-5 h-5 text-white" />
                     </div>
                     <div className="text-left">
-                      <span className="font-semibold text-white">Flashcards</span>
-                      <p className="text-xs text-slate-400">{selectedTopic.flashcards?.length || 0} tarjetas disponibles</p>
+                      <span className="font-semibold text-white">Flashcards / Términos</span>
+                      <p className="text-xs text-slate-400">
+                        {searchTerm ? `${filteredFlashcards.length} resultados` : `${selectedTopic.flashcards?.length || 0} tarjetas disponibles`}
+                      </p>
                     </div>
                   </div>
                   {expandedSection === 'flashcards' ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
                 </button>
                 {expandedSection === 'flashcards' && (
                   <div className="p-5 grid md:grid-cols-2 gap-3 border-t border-white/10">
-                    {selectedTopic.flashcards?.length > 0 ? selectedTopic.flashcards.map((card, idx) => (
-                      <div key={idx} className="p-4 bg-white/5 rounded-xl">
-                        <p className="text-white font-medium">{card.term}</p>
-                        <p className="text-slate-400 text-sm mt-1">{card.definition}</p>
+                    {filteredFlashcards.length > 0 ? filteredFlashcards.map((card, idx) => (
+                      <div key={idx} className="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors border border-white/5">
+                        <p className={`text-transparent bg-clip-text bg-gradient-to-r ${getTopicColor(selectedTopic.id)} font-semibold`}>
+                          {card.term}
+                        </p>
+                        <p className="text-slate-400 text-sm mt-2 leading-relaxed">{card.definition}</p>
                       </div>
-                    )) : <p className="text-slate-500 text-center py-4">No hay flashcards en este tema</p>}
+                    )) : (
+                      <p className="text-slate-500 text-center py-4 col-span-2">
+                        {searchTerm ? 'No se encontraron flashcards con ese término' : 'No hay flashcards en este tema'}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

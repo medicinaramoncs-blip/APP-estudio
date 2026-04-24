@@ -8,18 +8,18 @@ import ContentLibrary from './components/ContentLibrary';
 export default function App() {
   const [view, setView] = useState('home');
 
+  const topicCount = pathologyTopics.length;
+  const essayCount = pathologyTopics.reduce((acc, t) => acc + t.essays.length, 0);
+  const cardCount = pathologyTopics.reduce((acc, t) => acc + t.flashcards.length, 0);
+
   const renderView = () => {
     switch(view) {
       case 'essay': return <EssayTrainer />;
       case 'flashcards': return <Flashcards />;
       case 'library': return <ContentLibrary />;
-      default: return <HomeView onNavigate={setView} />;
+      default: return <HomeView onNavigate={setView} topicCount={topicCount} essayCount={essayCount} cardCount={cardCount} />;
     }
   };
-
-  const topicCount = pathologyTopics.length;
-  const essayCount = pathologyTopics.reduce((acc, t) => acc + t.essays.length, 0);
-  const cardCount = pathologyTopics.reduce((acc, t) => acc + t.flashcards.length, 0);
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
@@ -66,7 +66,7 @@ function NavBtn({ icon, label, active, onClick }) {
   );
 }
 
-function HomeView({ onNavigate }) {
+function HomeView({ onNavigate, topicCount, essayCount, cardCount }) {
   const features = [
     { 
       title: "Entrenador de Ensayo", 
@@ -126,15 +126,15 @@ function HomeView({ onNavigate }) {
       </div>
 
       <div className="mt-16 p-6 bg-gradient-to-r from-indigo-900/30 via-purple-900/30 to-rose-900/30 border border-white/10 rounded-3xl">
-        <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold text-white mb-1">Contenido disponible</h3>
-            <p className="text-slate-400">0 temas</p>
+            <p className="text-slate-400">{topicCount} temas · {essayCount} ensayos · {cardCount} tarjetas</p>
           </div>
           <div className="flex -space-x-3">
-            {['G', 'T', 'C', 'A', 'L', 'I', 'R', 'H', 'N', 'U'].map((topic, i) => (
-              <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-purple-600 border-2 border-[#0a0a0f] flex items-center justify-center text-xs font-medium text-white" title={topic}>
-                {topic[0]}
+            {pathologyTopics.map((topic, i) => (
+              <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-purple-600 border-2 border-[#0a0a0f] flex items-center justify-center text-xs font-medium text-white" title={topic.title}>
+                {topic.title[0]}
               </div>
             ))}
           </div>

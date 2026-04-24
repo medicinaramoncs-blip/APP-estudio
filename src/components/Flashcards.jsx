@@ -47,16 +47,10 @@ export default function Flashcards() {
   const streak = hasContent ? Math.min(knownCount, cards.length) : 0;
 
   const topicColors = {
-    generalidades: 'from-blue-500 to-cyan-500',
-    'tecnicas-histologicas': 'from-cyan-500 to-sky-500',
-    'citologia': 'from-teal-500 to-emerald-500',
+    'generalidades': 'from-blue-500 to-cyan-500',
     'adaptacion-celular': 'from-emerald-500 to-teal-500',
-    'lesion-muerte-celular': 'from-lime-500 to-green-500',
-    inflamacion: 'from-rose-500 to-red-500',
-    reparacion: 'from-orange-500 to-amber-500',
-    'hemodinamicos': 'from-amber-500 to-yellow-500',
-    neoplasias: 'from-purple-500 to-violet-500',
-    autopsia: 'from-slate-500 to-zinc-500'
+    'neoplasia': 'from-purple-500 to-violet-500',
+    'trastornos-hemodinamicos': 'from-rose-500 to-red-500'
   };
 
   const getTopicColor = (id) => topicColors[id] || 'from-gray-500 to-gray-600';
