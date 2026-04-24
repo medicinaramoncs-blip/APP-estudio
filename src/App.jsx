@@ -6,21 +6,20 @@ import Flashcards from './components/Flashcards';
 import ContentLibrary from './components/ContentLibrary';
 
 export default function App() {
-  console.log('[v0] App rendering, pathologyTopics:', pathologyTopics?.length);
   const [view, setView] = useState('home');
+
+  const topicCount = pathologyTopics.length;
+  const essayCount = pathologyTopics.reduce((acc, t) => acc + t.essays.length, 0);
+  const cardCount = pathologyTopics.reduce((acc, t) => acc + t.flashcards.length, 0);
 
   const renderView = () => {
     switch(view) {
       case 'essay': return <EssayTrainer />;
       case 'flashcards': return <Flashcards />;
       case 'library': return <ContentLibrary />;
-      default: return <HomeView onNavigate={setView} />;
+      default: return <HomeView onNavigate={setView} topicCount={topicCount} essayCount={essayCount} cardCount={cardCount} />;
     }
   };
-
-  const topicCount = pathologyTopics.length;
-  const essayCount = pathologyTopics.reduce((acc, t) => acc + t.essays.length, 0);
-  const cardCount = pathologyTopics.reduce((acc, t) => acc + t.flashcards.length, 0);
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
@@ -67,7 +66,7 @@ function NavBtn({ icon, label, active, onClick }) {
   );
 }
 
-function HomeView({ onNavigate }) {
+function HomeView({ onNavigate, topicCount, essayCount, cardCount }) {
   const features = [
     { 
       title: "Entrenador de Ensayo", 
